@@ -2,6 +2,7 @@ package tnet
 
 import (
 	"fmt"
+	"github.com/itzmn/tin/tiface"
 	"net"
 )
 
@@ -9,14 +10,9 @@ type Server struct {
 	Name string
 	IP   string
 	Port int
-}
 
-func CallBackToClient(conn *net.TCPConn, buff []byte, cnt int) (err error) {
-	fmt.Println("Connection Handle CallBackToClient...")
-	if _, err = conn.Write(buff[:cnt]); err != nil {
-		fmt.Println("connection write data to client err:", err)
-	}
-	return
+	// server 处理业务的函数
+	handle tiface.IHandler
 }
 
 func (s *Server) Start() {
@@ -44,7 +40,7 @@ func (s *Server) Start() {
 			continue
 		}
 		fmt.Println("[tinServer]listen accept to handle")
-		connection := NewConnection(conn, cid, CallBackToClient)
+		connection := NewConnection(conn, cid, s.handle)
 		cid++
 		connection.Start()
 	}
@@ -53,12 +49,16 @@ func (s *Server) Start() {
 
 func NewServer(name, ip string, port int) *Server {
 	return &Server{
-		Name: name,
-		IP:   ip,
-		Port: port,
+		Name:   name,
+		IP:     ip,
+		Port:   port,
+		handle: nil,
 	}
 }
 
+func (s *Server) AddHandle(handle tiface.IHandler) {
+	s.handle = handle
+}
 func (s *Server) Stop() {
 	// TODO 关闭系统资源
 	fmt.Println("[tinServer]server stop")

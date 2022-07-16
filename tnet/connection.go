@@ -15,17 +15,17 @@ type Connection struct {
 	// 链接状态
 	IsClose chan bool
 
-	// 链接处理业务的函数
-	handleFunc tiface.HandleFunc
+	// 用户处理业务的函数
+	handle tiface.IHandler
 }
 
-func NewConnection(conn *net.TCPConn, id uint32, handleFunc tiface.HandleFunc) *Connection {
+func NewConnection(conn *net.TCPConn, id uint32, handle tiface.IHandler) *Connection {
 
 	return &Connection{
 		Conn:         conn,
 		ConnectionId: id,
 		IsClose:      make(chan bool, 1),
-		handleFunc:   handleFunc,
+		handle:       handle,
 	}
 
 }
@@ -68,13 +68,20 @@ func (c *Connection) StartReader() {
 			buff := make([]byte, 512)
 			cnt, err := c.GetTCPConnection().Read(buff)
 			if err != nil {
-				fmt.Printf("[tinServer]connection read data from client %s err: %v", c.GetRemoteAddr(), err)
+				fmt.Printf("[tinServer]connection read data from client %s err: %v\n", c.GetRemoteAddr(), err)
 				return
 			}
 			// 调用当前链接处理数据的方法
 			fmt.Printf("[tinServer]connection read data:%v;  from client %s\n", string(buff[:cnt]), c.GetRemoteAddr())
 
-			c.handleFunc(c.Conn, buff, cnt)
+			// 封装请求
+			request := NewRequest(c, buff)
+			// 链接对请求进行处理，用户可以自定义处理逻辑
+			go func(request tiface.IRequest) {
+				c.handle.PreHandle(request)
+				c.handle.Handle(request)
+				c.handle.PostHandle(request)
+			}(request)
 
 		}
 	}

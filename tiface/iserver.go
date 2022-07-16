@@ -12,4 +12,7 @@ type IServer interface {
 	Stop()
 	// Serve 执行server逻辑
 	Serve()
+
+	// AddHandle 增加处理业务的逻辑
+	AddHandle(handle IHandler)
 }

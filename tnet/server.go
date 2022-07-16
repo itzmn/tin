@@ -11,46 +11,42 @@ type Server struct {
 	Port int
 }
 
+func CallBackToClient(conn *net.TCPConn, buff []byte, cnt int) (err error) {
+	fmt.Println("Connection Handle CallBackToClient...")
+	if _, err = conn.Write(buff[:cnt]); err != nil {
+		fmt.Println("connection write data to client err:", err)
+	}
+	return
+}
+
 func (s *Server) Start() {
 
 	// 启动server监听
 	listenAddr := fmt.Sprintf("%s:%v", s.IP, s.Port)
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", listenAddr)
 	if err != nil {
-		fmt.Println("resolve tcpAddr err:", err)
+		fmt.Println("[tinServer]resolve tcpAddr err:", err)
 		return
 	}
 	listen, err := net.ListenTCP("tcp4", tcpAddr)
 	if err != nil {
-		fmt.Println("listen ", listenAddr, " err, ", err)
+		fmt.Println("[tinServer]listen ", listenAddr, " err, ", err)
 		return
 	}
-	fmt.Println("server listen ", listenAddr, "success, listening...")
+	fmt.Println("[tinServer]server listen ", listenAddr, "success, listening...")
+	var cid uint32
+	cid = 0
 	for true {
 		// 等待连接
-		conn, err := listen.Accept()
+		conn, err := listen.AcceptTCP()
 		if err != nil {
-			fmt.Println("listen accept err, ", err)
+			fmt.Println("[tinServer]listen accept err, ", err)
 			continue
 		}
-		fmt.Println("listen accept to handle")
-		go func() {
-
-			for true {
-				buff := make([]byte, 512)
-				cnt, err := conn.Read(buff)
-				if err != nil {
-					fmt.Println("conn read data err: ", err)
-					return
-				}
-				//res := string(buff)
-				fmt.Printf("recive buf:%v, cnt:%d\n", string(buff[:cnt]), cnt)
-				if _, err := conn.Write(buff[:cnt]); err != nil {
-					fmt.Println("rewrite err:", err)
-				}
-			}
-
-		}()
+		fmt.Println("[tinServer]listen accept to handle")
+		connection := NewConnection(conn, cid, CallBackToClient)
+		cid++
+		connection.Start()
 	}
 
 }
@@ -65,11 +61,11 @@ func NewServer(name, ip string, port int) *Server {
 
 func (s *Server) Stop() {
 	// TODO 关闭系统资源
-	fmt.Println("[tin] server stop")
+	fmt.Println("[tinServer]server stop")
 }
 
 func (s *Server) Serve() {
-	fmt.Println("[tin] server serve")
+	fmt.Println("[tinServer]server serve")
 	s.Start()
 
 }

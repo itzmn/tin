@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"github.com/itzmn/tin/config"
 	"net"
 	"time"
 )
 
 func main() {
-	ip := "127.0.0.1"
-	port := 9999
+	ip := config.GConfig.IP
+	port := config.GConfig.Port
 	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", ip, port))
 	if err != nil {
 		fmt.Println("dial err:", err)

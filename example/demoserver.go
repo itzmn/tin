@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/itzmn/tin/config"
 	"github.com/itzmn/tin/tiface"
 	"github.com/itzmn/tin/tnet"
 )
@@ -27,9 +28,10 @@ func (p *PingHandle) PostHandle(request tiface.IRequest) {
 }
 
 func main() {
-	name := "tinServer"
-	ip := "127.0.0.1"
-	port := 9999
+
+	name := config.GConfig.ServerName
+	ip := config.GConfig.IP
+	port := config.GConfig.Port
 	server := tnet.NewServer(name, ip, port)
 	server.AddHandle(&PingHandle{})
 

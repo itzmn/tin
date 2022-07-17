@@ -21,7 +21,7 @@ func init() {
 }
 
 func reload() {
-	file, err := os.Open("config.json")
+	file, err := os.Open("config/config.json")
 	if err != nil {
 		fmt.Println("read config file err")
 		return

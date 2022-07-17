@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/itzmn/tin/config"
+	"github.com/itzmn/tin/tnet"
 	"net"
 	"time"
 )
@@ -16,7 +17,14 @@ func main() {
 		return
 	}
 	for true {
-		_, err = conn.Write([]byte{'a', 'b'})
+		dataPack := tnet.NewDataPack()
+		msg := &tnet.Message{
+			MsgId:   1,
+			MsgLen:  2,
+			MsgData: []byte{'a', 'b'},
+		}
+		bytes, err := dataPack.Pack(msg)
+		_, err = conn.Write(bytes)
 		if err != nil {
 			fmt.Println("write err:", err)
 			return
@@ -31,5 +39,6 @@ func main() {
 		fmt.Println("from server read data:", string(buff[:cnt]))
 		time.Sleep(3 * time.Second)
 	}
+	fmt.Println("client end...")
 
 }

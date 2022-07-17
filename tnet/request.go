@@ -6,6 +6,8 @@ import "github.com/itzmn/tin/tiface"
 type Request struct {
 	conn *Connection
 	data []byte
+	// 消息
+	message tiface.IMessage
 }
 
 func (r *Request) GetConnection() tiface.IConnection {
@@ -16,11 +18,12 @@ func (r *Request) GetData() []byte {
 	return r.data
 }
 
-func NewRequest(conn *Connection, data []byte) *Request {
+func NewRequest(conn *Connection, data []byte, message tiface.IMessage) *Request {
 
 	return &Request{
-		conn: conn,
-		data: data,
+		conn:    conn,
+		data:    data,
+		message: message,
 	}
 
 }

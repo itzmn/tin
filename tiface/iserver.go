@@ -14,5 +14,5 @@ type IServer interface {
 	Serve()
 
 	// AddHandle 增加处理业务的逻辑
-	AddHandle(handle IHandler)
+	AddHandle(msgId uint32, handle IHandler)
 }

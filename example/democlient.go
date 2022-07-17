@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/itzmn/tin/config"
 	"github.com/itzmn/tin/tnet"
+	"math/rand"
 	"net"
 	"time"
 )
@@ -19,7 +20,7 @@ func main() {
 	for true {
 		dataPack := tnet.NewDataPack()
 		msg := &tnet.Message{
-			MsgId:   1,
+			MsgId:   uint32(rand.Int()%2 + 1),
 			MsgLen:  2,
 			MsgData: []byte{'a', 'b'},
 		}

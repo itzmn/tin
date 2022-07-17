@@ -11,20 +11,24 @@ type PingHandle struct {
 	tnet.BaseHandler
 }
 
-func (p *PingHandle) PreHandle(request tiface.IRequest) {
-	fmt.Println("PingHandle preHandle, connectionId=", request.GetConnection().GetConnId())
-}
-
 func (p *PingHandle) Handle(request tiface.IRequest) {
-	fmt.Println("PingHandle Handle request, connectionId=", request.GetConnection().GetConnId())
+	fmt.Printf("PingHandle Handle request, MessageId=%d, connectionId=%d\n", request.GetMessage().GetMsgId(), request.GetConnection().GetConnId())
 	_, err := request.GetConnection().GetTCPConnection().Write([]byte("PingHandle return Ping Ping Ping"))
 	if err != nil {
 		fmt.Println("PingHandle handle err:", err)
 	}
 }
 
-func (p *PingHandle) PostHandle(request tiface.IRequest) {
-	fmt.Println("PingHandle postHandle request, connectionId=", request.GetConnection().GetConnId())
+type PongHandle struct {
+	tnet.BaseHandler
+}
+
+func (p *PongHandle) Handle(request tiface.IRequest) {
+	fmt.Printf("PongHandle Handle request, MessageId=%d, connectionId=%d\n", request.GetMessage().GetMsgId(), request.GetConnection().GetConnId())
+	_, err := request.GetConnection().GetTCPConnection().Write([]byte("PongHandle return Pong Pong Pong"))
+	if err != nil {
+		fmt.Println("PongHandle handle err:", err)
+	}
 }
 
 func main() {
@@ -33,7 +37,8 @@ func main() {
 	ip := config.GConfig.IP
 	port := config.GConfig.Port
 	server := tnet.NewServer(name, ip, port)
-	server.AddHandle(&PingHandle{})
+	server.AddHandle(1, &PingHandle{})
+	server.AddHandle(2, &PongHandle{})
 
 	server.Serve()
 }

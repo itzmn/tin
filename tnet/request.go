@@ -10,6 +10,10 @@ type Request struct {
 	message tiface.IMessage
 }
 
+func (r *Request) GetMessage() tiface.IMessage {
+	return r.message
+}
+
 func (r *Request) GetConnection() tiface.IConnection {
 	return r.conn
 }

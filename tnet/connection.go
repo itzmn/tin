@@ -7,7 +7,7 @@ import (
 )
 
 type Connection struct {
-
+	Server *Server
 	// 链接id
 	ConnectionId uint32
 	// tcp socket链接
@@ -19,13 +19,13 @@ type Connection struct {
 	handle tiface.IHandler
 }
 
-func NewConnection(conn *net.TCPConn, id uint32, handle tiface.IHandler) *Connection {
+func NewConnection(conn *net.TCPConn, id uint32, server *Server) *Connection {
 
 	return &Connection{
 		Conn:         conn,
 		ConnectionId: id,
 		IsClose:      make(chan bool, 1),
-		handle:       handle,
+		Server:       server,
 	}
 
 }
@@ -92,14 +92,16 @@ func (c *Connection) StartReader() {
 		// 5、封装request
 		// 封装请求
 		request := NewRequest(c, buff, message)
+
 		// 6、处理request
 		// 调用当前链接处理数据的方法
 		// 链接对请求进行处理，用户可以自定义处理逻辑
-		go func(request tiface.IRequest) {
-			c.handle.PreHandle(request)
-			c.handle.Handle(request)
-			c.handle.PostHandle(request)
-		}(request)
+		go c.Server.router.DoHandle(request)
+		//go func(request tiface.IRequest) {
+		//	c.handle.PreHandle(request)
+		//	c.handle.Handle(request)
+		//	c.handle.PostHandle(request)
+		//}(request)
 
 	}
 

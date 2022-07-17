@@ -12,7 +12,7 @@ type Server struct {
 	Port int
 
 	// server 处理业务的函数
-	handle tiface.IHandler
+	router *Router
 }
 
 func (s *Server) Start() {
@@ -40,7 +40,7 @@ func (s *Server) Start() {
 			continue
 		}
 		fmt.Println("[tinServer]listen accept to handle")
-		connection := NewConnection(conn, cid, s.handle)
+		connection := NewConnection(conn, cid, s)
 		cid++
 		connection.Start()
 	}
@@ -52,13 +52,13 @@ func NewServer(name, ip string, port int) *Server {
 		Name:   name,
 		IP:     ip,
 		Port:   port,
-		handle: nil,
+		router: &Router{routerMap: make(map[uint32]tiface.IHandler)},
 	}
 }
-
-func (s *Server) AddHandle(handle tiface.IHandler) {
-	s.handle = handle
+func (s *Server) AddHandle(msgId uint32, handle tiface.IHandler) {
+	s.router.AddHandler(msgId, handle)
 }
+
 func (s *Server) Stop() {
 	// TODO 关闭系统资源
 	fmt.Println("[tinServer]server stop")

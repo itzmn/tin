@@ -9,4 +9,8 @@ type IRouter interface {
 	AddHandler(msgId uint32, handler IHandler)
 	// DoHandle 执行业务的方法
 	DoHandle(request IRequest)
+	// StartWorkerPool 开启线程池处理任务
+	StartWorkerPool()
+	// SendRequestToTaskQueue 将消息发送给消息队列
+	SendRequestToTaskQueue(request IRequest)
 }

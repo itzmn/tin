@@ -10,10 +10,11 @@ import (
 var GConfig *ServerConfig
 
 type ServerConfig struct {
-	ServerName string
-	IP         string
-	Port       int
-	Version    string
+	ServerName     string
+	IP             string
+	Port           int
+	Version        string
+	WorkerPoolSize int
 }
 
 func init() {
@@ -21,7 +22,7 @@ func init() {
 }
 
 func reload() {
-	file, err := os.Open("config/config.json")
+	file, err := os.Open("config.json")
 	if err != nil {
 		fmt.Println("read config file err")
 		return

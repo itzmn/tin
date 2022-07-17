@@ -99,7 +99,8 @@ func (c *Connection) startReader() {
 		// 6、处理request
 		// 调用当前链接处理数据的方法
 		// 链接对请求进行处理，用户可以自定义处理逻辑
-		go c.Server.router.DoHandle(request)
+		go c.Server.router.SendRequestToTaskQueue(request)
+		//go c.Server.router.DoHandle(request)
 
 	}
 

@@ -30,6 +30,7 @@ func (s *Server) Start() {
 		return
 	}
 	fmt.Println("[tinServer]server listen ", listenAddr, "success, listening...")
+	s.router.StartWorkerPool()
 	var cid uint32
 	cid = 0
 	for true {
@@ -52,7 +53,7 @@ func NewServer(name, ip string, port int) *Server {
 		Name:   name,
 		IP:     ip,
 		Port:   port,
-		router: &Router{routerMap: make(map[uint32]tiface.IHandler)},
+		router: NewRouter(),
 	}
 }
 func (s *Server) AddHandle(msgId uint32, handle tiface.IHandler) {

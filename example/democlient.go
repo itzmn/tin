@@ -18,6 +18,7 @@ func main() {
 		return
 	}
 	for true {
+		// 将数据打包发送给server端
 		dataPack := tnet.NewDataPack()
 		msg := &tnet.Message{
 			MsgId:   uint32(rand.Int()%2 + 1),
@@ -31,13 +32,15 @@ func main() {
 			return
 		}
 
-		buff := make([]byte, 512)
-		cnt, err := conn.Read(buff)
+		// 读取server 回写的数据
+		message, err := tnet.ReadConnectionDataToMessage(conn)
+		//buff := make([]byte, 512)
+		//cnt, err := conn.Read(buff)
 		if err != nil {
 			fmt.Println("read err:", err)
 			return
 		}
-		fmt.Println("from server read data:", string(buff[:cnt]))
+		fmt.Println("from server read data:", string(message.GetMsgData()))
 		time.Sleep(3 * time.Second)
 	}
 	fmt.Println("client end...")

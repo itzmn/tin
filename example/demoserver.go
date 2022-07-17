@@ -13,7 +13,7 @@ type PingHandle struct {
 
 func (p *PingHandle) Handle(request tiface.IRequest) {
 	fmt.Printf("PingHandle Handle request, MessageId=%d, connectionId=%d\n", request.GetMessage().GetMsgId(), request.GetConnection().GetConnId())
-	_, err := request.GetConnection().GetTCPConnection().Write([]byte("PingHandle return Ping Ping Ping"))
+	err := request.GetConnection().SendMsg(1, []byte("PingHandle return Ping Ping Ping"))
 	if err != nil {
 		fmt.Println("PingHandle handle err:", err)
 	}
@@ -25,7 +25,7 @@ type PongHandle struct {
 
 func (p *PongHandle) Handle(request tiface.IRequest) {
 	fmt.Printf("PongHandle Handle request, MessageId=%d, connectionId=%d\n", request.GetMessage().GetMsgId(), request.GetConnection().GetConnId())
-	_, err := request.GetConnection().GetTCPConnection().Write([]byte("PongHandle return Pong Pong Pong"))
+	err := request.GetConnection().SendMsg(1, []byte("PongHandle return Pong Pong Pong"))
 	if err != nil {
 		fmt.Println("PongHandle handle err:", err)
 	}

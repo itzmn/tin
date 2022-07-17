@@ -15,4 +15,7 @@ type IServer interface {
 
 	// AddHandle 增加处理业务的逻辑
 	AddHandle(msgId uint32, handle IHandler)
+
+	SetOnConnStart(func(connection IConnection))
+	SetOnConnStop(func(connection IConnection))
 }

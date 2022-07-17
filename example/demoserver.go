@@ -12,8 +12,9 @@ type PingHandle struct {
 }
 
 func (p *PingHandle) Handle(request tiface.IRequest) {
-	fmt.Printf("PingHandle Handle request, MessageId=%d, connectionId=%d\n", request.GetMessage().GetMsgId(), request.GetConnection().GetConnId())
-	err := request.GetConnection().SendMsg(1, []byte("PingHandle return Ping Ping Ping"))
+	fmt.Printf("PingHandle Handle request,connectionId=%d, msgId=%d, msgData:%v\n",
+		request.GetConnection().GetConnId(), request.GetMessage().GetMsgId(), string(request.GetMessage().GetMsgData()))
+	err := request.GetConnection().SendMsg(5, []byte("PingHandle return Ping Ping Ping"))
 	if err != nil {
 		fmt.Println("PingHandle handle err:", err)
 	}
@@ -24,8 +25,9 @@ type PongHandle struct {
 }
 
 func (p *PongHandle) Handle(request tiface.IRequest) {
-	fmt.Printf("PongHandle Handle request, MessageId=%d, connectionId=%d\n", request.GetMessage().GetMsgId(), request.GetConnection().GetConnId())
-	err := request.GetConnection().SendMsg(1, []byte("PongHandle return Pong Pong Pong"))
+	fmt.Printf("PongHandle Handle request,connectionId=%d, msgId=%d, msgData:%v\n",
+		request.GetConnection().GetConnId(), request.GetMessage().GetMsgId(), string(request.GetMessage().GetMsgData()))
+	err := request.GetConnection().SendMsg(5, []byte("PongHandle return Pong Pong Pong"))
 	if err != nil {
 		fmt.Println("PongHandle handle err:", err)
 	}
@@ -40,5 +42,8 @@ func main() {
 	server.AddHandle(1, &PingHandle{})
 	server.AddHandle(2, &PongHandle{})
 
+	server.SetOnConnStart(func(connection tiface.IConnection) {
+		fmt.Println("this is hook func, onConnStart, connId=", connection.GetConnId())
+	})
 	server.Serve()
 }

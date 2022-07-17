@@ -65,13 +65,22 @@ func (c *Connection) Start() (err error) {
 	go c.startReader()
 	// 启动从当前链接写数据的功能
 	go c.startWriter()
+	// 启动用户定义的钩子函数
+	if c.Server.connStartFunc != nil {
+		c.Server.connStartFunc(c)
+	}
+
 	return
 }
 func (c *Connection) Stop() (err error) {
 	fmt.Println("[tinServer]Connection Stop, Id =", c.ConnectionId)
+	// 启动用户定义的钩子函数
+	if c.Server.connStopFunc != nil {
+		c.Server.connStopFunc(c)
+	}
+	c.Server.connManger.DelConn(c.GetConnId())
 	err = c.Conn.Close()
 	c.IsClose <- true
-	c.Server.connManger.DelConn(c.GetConnId())
 	return
 }
 

@@ -16,6 +16,17 @@ type Server struct {
 	router *Router
 	// 链接管理模块
 	connManger *ConnManager
+	// 链接相关钩子函数
+	connStartFunc func(connection tiface.IConnection)
+	connStopFunc  func(connection tiface.IConnection)
+}
+
+func (s *Server) SetOnConnStart(f func(connection tiface.IConnection)) {
+	s.connStartFunc = f
+}
+
+func (s *Server) SetOnConnStop(f func(connection tiface.IConnection)) {
+	s.connStopFunc = f
 }
 
 func (s *Server) Start() {

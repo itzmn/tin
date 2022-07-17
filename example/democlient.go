@@ -40,7 +40,8 @@ func main() {
 			fmt.Println("read err:", err)
 			return
 		}
-		fmt.Println("from server read data:", string(message.GetMsgData()))
+		fmt.Printf("from server data, msgId=%d, msgLen=%d, msgData:%v\n",
+			message.GetMsgId(), message.GetMsgLen(), string(message.GetMsgData()))
 		time.Sleep(3 * time.Second)
 	}
 	fmt.Println("client end...")

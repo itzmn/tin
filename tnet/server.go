@@ -2,6 +2,7 @@ package tnet
 
 import (
 	"fmt"
+	"github.com/itzmn/tin/config"
 	"github.com/itzmn/tin/tiface"
 	"net"
 )
@@ -13,6 +14,8 @@ type Server struct {
 
 	// server 处理业务的函数
 	router *Router
+	// 链接管理模块
+	connManger *ConnManager
 }
 
 func (s *Server) Start() {
@@ -41,7 +44,25 @@ func (s *Server) Start() {
 			continue
 		}
 		fmt.Println("[tinServer]listen accept to handle")
+
+		// 链接过多 直接拒绝
+		if s.connManger.GetConnCnt() >= config.GConfig.MaxConnectionSize {
+			fmt.Printf("[tinServer]current ConnectSize:%d, tooManyConnection; from client:%s\n",
+				s.connManger.GetConnCnt(), conn.RemoteAddr())
+			dataPack := NewDataPack()
+			str := "server too many connection"
+			msg := &Message{
+				MsgId:   0,
+				MsgLen:  uint32(len(str)),
+				MsgData: []byte(str),
+			}
+			bytes, _ := dataPack.Pack(msg)
+			conn.Write(bytes)
+			conn.Close()
+			continue
+		}
 		connection := NewConnection(conn, cid, s)
+		s.connManger.AddConn(cid, connection)
 		cid++
 		connection.Start()
 	}
@@ -50,10 +71,11 @@ func (s *Server) Start() {
 
 func NewServer(name, ip string, port int) *Server {
 	return &Server{
-		Name:   name,
-		IP:     ip,
-		Port:   port,
-		router: NewRouter(),
+		Name:       name,
+		IP:         ip,
+		Port:       port,
+		router:     NewRouter(),
+		connManger: NewConnManager(),
 	}
 }
 func (s *Server) AddHandle(msgId uint32, handle tiface.IHandler) {
@@ -63,6 +85,8 @@ func (s *Server) AddHandle(msgId uint32, handle tiface.IHandler) {
 func (s *Server) Stop() {
 	// TODO 关闭系统资源
 	fmt.Println("[tinServer]server stop")
+	// 关闭所有的链接
+	s.connManger.Clear()
 }
 
 func (s *Server) Serve() {

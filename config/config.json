@@ -3,5 +3,6 @@
   "IP": "127.0.0.1",
   "Port": 9999,
   "Version": "v1",
-  "WorkerPoolSize": 2
+  "WorkerPoolSize": 2,
+  "MaxConnectionSize": 2
 }

@@ -71,6 +71,7 @@ func (c *Connection) Stop() (err error) {
 	fmt.Println("[tinServer]Connection Stop, Id =", c.ConnectionId)
 	err = c.Conn.Close()
 	c.IsClose <- true
+	c.Server.connManger.DelConn(c.GetConnId())
 	return
 }
 

@@ -10,11 +10,12 @@ import (
 var GConfig *ServerConfig
 
 type ServerConfig struct {
-	ServerName     string
-	IP             string
-	Port           int
-	Version        string
-	WorkerPoolSize int
+	ServerName        string
+	IP                string
+	Port              int
+	Version           string
+	WorkerPoolSize    int
+	MaxConnectionSize int
 }
 
 func init() {
